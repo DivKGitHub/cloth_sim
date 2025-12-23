@@ -1,10 +1,14 @@
 # Cloth Manipulation Simulation Environment
 
-This repository contains a physics-based simulation environment for **cloth manipulation tasks**, designed for research in robot learning, imitation learning, and sim-to-real evaluation. 
+This repository contains a physics-based simulation environment for **cloth manipulation tasks**.
 
 The environment supports contact-rich interactions between deformable cloth and robot URDFs, and is intended to be used for demo collection, policy training, and evaluation. It is designed to support the [2026 WBCD competition](https://wbcdcompetition.github.io/). Please refer to the details of the deformable manipulation task in the competition [here](https://wbcdcompetition.github.io/competition-tracks.html#dm).
 
 The simulator is based on [NVIDIA Newton](https://github.com/newton-physics/newton). Although Newton has flexible support for deformable objects like clothes, it is still in **active beta development** stage. Thus, this repo is still subject to updates and needs case-specific integration into existing robot learning frameworks. Please be aware when adopting this environment for your own use.
+
+A video showing the WBCD deformable maipulation task:
+
+https://github.com/user-attachments/assets/c8cdb991-998f-4cec-9853-c7a65b4a8f7d
 
 ---
 
@@ -43,4 +47,4 @@ python experiments/demo.py
 
 This command runs a manually defined robot action trajectory, shown as follows:
 
-https://github.com/user-attachments/assets/c8cdb991-998f-4cec-9853-c7a65b4a8f7d
+https://github.com/user-attachments/assets/d9273615-c808-4415-bdf4-64beb6ecd5f9
