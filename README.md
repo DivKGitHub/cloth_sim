@@ -13,17 +13,16 @@ https://github.com/user-attachments/assets/c8cdb991-998f-4cec-9853-c7a65b4a8f7d
 ---
 
 ## Installation
+Clone the repo and create a UV virtual environment.
 
+```bash
+uv venv venv
 ```
-# clone the repo
-git clone --recurse-submodules git@github.com:kywind/cloth_sim.git
-cd cloth_sim
 
-# create and activate a python venv
-uv venv --python=3.11
-source .venv/bin/activate
+Clone and install the Nvidia Newton simulator from its main branch.
 
-# install newton
+```bash
+git clone https://github.com/kywind/newton.git newton  
 cd newton
 uv pip install -r pyproject.toml --extra examples
 
@@ -41,7 +40,7 @@ uv pip install opencv-python omegaconf hydra-core pynput transforms3d ipdb joyco
 
 ## Usage
 
-```
+``` bash
 python experiments/demo.py
 ```
 
