@@ -16,8 +16,12 @@ import newton
 import newton.utils
 import newton.viewer
 
+# Teleop imports
+from teleop.devices.xr_controller import XRControllerDevice
+from teleop.retargeters import XRSe3AbsRetargeter, XRSe3AbsRetargeterCfg, XRGripperRetargeter, XRGripperRetargeterCfg
 
-class DemoEnv:
+
+class TeleopDemoEnv:
 
     def __init__(self, cfg):
         self.cfg = cfg
@@ -28,6 +32,26 @@ class DemoEnv:
             self.out_path = os.path.join(cfg.exp_root, 'output_demo', f'{timestamp}')
             mkdir(Path(f'{self.out_path}'), resume=False, overwrite=False)
             OmegaConf.save(cfg, f'{self.out_path}/hydra.yaml', resolve=True)
+
+        # Initialize XR device
+        self.xr_device = XRControllerDevice()
+
+        # Initialize retargeters for two arms
+        # Left arm SE(3) retargeter
+        left_se3_cfg = XRSe3AbsRetargeterCfg(control_hand="left", zero_out_xy_rotation=True)
+        self.left_se3_retargeter = XRSe3AbsRetargeter(left_se3_cfg)
+
+        # Right arm SE(3) retargeter
+        right_se3_cfg = XRSe3AbsRetargeterCfg(control_hand="right", zero_out_xy_rotation=True)
+        self.right_se3_retargeter = XRSe3AbsRetargeter(right_se3_cfg)
+
+        # Left gripper retargeter
+        left_gripper_cfg = XRGripperRetargeterCfg(control_hand="left", input_source="trigger", mode="continuous")
+        self.left_gripper_retargeter = XRGripperRetargeter(left_gripper_cfg)
+
+        # Right gripper retargeter
+        right_gripper_cfg = XRGripperRetargeterCfg(control_hand="right", input_source="trigger", mode="continuous")
+        self.right_gripper_retargeter = XRGripperRetargeter(right_gripper_cfg)
 
     def _make_ik_targets(self, cfg):
         table_height = float(cfg.env.get("table_height", 0.0))
@@ -78,25 +102,25 @@ class DemoEnv:
         env = eval(cfg.env.name)(cfg=cfg)
         env.initialize_resources()
 
-        is_joint_pd = cfg.controller.name == "sim.controller.JointPDController"
-        if is_joint_pd:
-            targets = self._make_joint_pd_targets(env)
-        else:
-            targets = self._make_ik_targets(cfg)
-
-        target_idx = 0
-        target = targets[target_idx, :-1].copy()
-        to_target_time = targets[target_idx, -1]
-
         while env.viewer.is_running():
 
             if not env.viewer.is_paused():
-                env.step({'target': np.tile(target, (env.num_envs, 1))})
+                # Read XR device data
+                xr_data = self.xr_device.read()
 
-            if env.sim_time > to_target_time and target_idx < (targets.shape[0] - 1):
-                target_idx += 1
-                target = targets[target_idx, :-1].copy()
-                to_target_time += targets[target_idx, -1]
+                # Retarget for left arm
+                left_pose = self.left_se3_retargeter.retarget(xr_data)
+                left_gripper = self.left_gripper_retargeter.retarget(xr_data)
+
+                # Retarget for right arm
+                right_pose = self.right_se3_retargeter.retarget(xr_data)
+                right_gripper = self.right_gripper_retargeter.retarget(xr_data)
+
+                # Combine into target format: [left_pose (7), left_gripper (1), right_pose (7), right_gripper (1)] = 16 values
+                target = torch.cat([left_pose, left_gripper, right_pose, right_gripper]).cpu().numpy()
+
+                # Tile for multiple environments if needed
+                env.step({'target': np.tile(target, (env.num_envs, 1))})
 
             render_result = env.render(return_renderings=self.cfg.save_state)
 
@@ -112,7 +136,7 @@ class DemoEnv:
 
 @hydra.main(version_base='1.2', config_path='../cfg', config_name="default")
 def main(cfg):
-    demo_env = DemoEnv(cfg)
+    demo_env = TeleopDemoEnv(cfg)
     demo_env.run()
 
 
