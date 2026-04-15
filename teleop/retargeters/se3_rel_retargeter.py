@@ -12,7 +12,7 @@ from scipy.spatial.transform import Rotation
 from typing import Any
 
 from isaaclab.devices.retargeter_base import RetargeterBase, RetargeterCfg
-from isaaclab_xr_teleop.devices.xr_controller import XRControllerDevice
+from teleop.devices.xr_controller import XRControllerDevice
 from isaaclab.markers import VisualizationMarkers
 from isaaclab.markers.config import FRAME_MARKER_CFG
 
