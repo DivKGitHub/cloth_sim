@@ -4,3 +4,6 @@
 [submodule "rl_games"]
 	path = rl_games
 	url = git@github.com:kywind/rl_games.git
+[submodule "submodules/IsaacLab"]
+	path = submodules/IsaacLab
+	url = https://github.com/isaac-sim/IsaacLab.git
