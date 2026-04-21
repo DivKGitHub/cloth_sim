@@ -17,11 +17,10 @@ import newton.utils
 import newton.viewer
 
 # Teleop imports
-from teleop.devices.xr_controller import XRControllerDevice
 from teleop.retargeters import XRSe3AbsRetargeter, XRSe3AbsRetargeterCfg, XRGripperRetargeter, XRGripperRetargeterCfg
 
 
-class TeleopDemoEnv:
+class RetargeterTestEnv:
 
     def __init__(self, cfg):
         self.cfg = cfg
@@ -136,8 +135,8 @@ class TeleopDemoEnv:
 
 @hydra.main(version_base='1.2', config_path='../cfg', config_name="default")
 def main(cfg):
-    demo_env = TeleopDemoEnv(cfg)
-    demo_env.run()
+    rt_env = RetargeterTestEnv(cfg)
+    rt_env.run()
 
 
 if __name__ == "__main__":
