@@ -15,6 +15,7 @@ import sim.env
 import newton
 import newton.utils
 import newton.viewer
+import torch
 
 # Teleop imports
 from teleop.retargeters import XRSe3AbsRetargeter, XRSe3AbsRetargeterCfg, XRGripperRetargeter, XRGripperRetargeterCfg
@@ -31,9 +32,6 @@ class RetargeterTestEnv:
             self.out_path = os.path.join(cfg.exp_root, 'output_demo', f'{timestamp}')
             mkdir(Path(f'{self.out_path}'), resume=False, overwrite=False)
             OmegaConf.save(cfg, f'{self.out_path}/hydra.yaml', resolve=True)
-
-        # Initialize XR device
-        self.xr_device = XRControllerDevice()
 
         # Initialize retargeters for two arms
         # Left arm SE(3) retargeter
@@ -101,36 +99,44 @@ class RetargeterTestEnv:
         env = eval(cfg.env.name)(cfg=cfg)
         env.initialize_resources()
 
-        while env.viewer.is_running():
+        is_joint_pd = cfg.controller.name == "sim.controller.JointPDController"
+        if is_joint_pd:
+            targets = self._make_joint_pd_targets(env)
+        else:
+            targets = self._make_ik_targets(cfg)
 
+        target_idx = 0
+        target = targets[target_idx, :-1].copy()
+        to_target_time = targets[target_idx, -1]
+
+        while env.viewer.is_running():
+            
             if not env.viewer.is_paused():
-                # Read XR device data
+                # --- 1. Read XR ---
                 xr_data = self.xr_device.read()
 
-                # Retarget for left arm
                 left_pose = self.left_se3_retargeter.retarget(xr_data)
                 left_gripper = self.left_gripper_retargeter.retarget(xr_data)
 
-                # Retarget for right arm
                 right_pose = self.right_se3_retargeter.retarget(xr_data)
                 right_gripper = self.right_gripper_retargeter.retarget(xr_data)
 
-                # Combine into target format: [left_pose (7), left_gripper (1), right_pose (7), right_gripper (1)] = 16 values
-                target = torch.cat([left_pose, left_gripper, right_pose, right_gripper]).cpu().numpy()
+                xr_target = torch.cat([
+                    left_pose, left_gripper,
+                    right_pose, right_gripper
+                ]).cpu().numpy()
 
-                # Tile for multiple environments if needed
+                # --- 2. Use trajectory timing as "update gate" ---
+                if env.sim_time > self.to_target_time:
+
+                    # update current "trajectory waypoint" from XR
+                    target = xr_target.copy()
+
+                    # treat XR as a new waypoint with fixed dwell time
+                    self.to_target_time += 0.5   # or cfg-controlled timestep
+
+                # --- 3. Execute ---
                 env.step({'target': np.tile(target, (env.num_envs, 1))})
-
-            render_result = env.render(return_renderings=self.cfg.save_state)
-
-            if self.cfg.save_state:
-                assert 'rgba' in render_result
-                rgba = render_result['rgba']
-                cv2.imwrite(
-                    f'{self.out_path}/{self.cnt:06d}.png',
-                    cv2.cvtColor(rgba[:, :, :3], cv2.COLOR_RGB2BGR)
-                )
-                self.cnt += 1
 
 
 @hydra.main(version_base='1.2', config_path='../cfg', config_name="default")
