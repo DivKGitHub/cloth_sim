@@ -6,14 +6,17 @@ A physics-based simulation environment for **bimanual cloth manipulation** with 
 
 https://github.com/user-attachments/assets/c8cdb991-998f-4cec-9853-c7a65b4a8f7d
 
+## IsaacLab Teleop
+IsaacLab-based XR teleoperation has been incorporated into this branch from this [repo](https://github.com/zhigenzhao/isaaclab_xr_teleop.git).
 ---
 
 ## Installation
 
 ```bash
 # Clone with submodules
-git clone --recurse-submodules git@github.com:kywind/cloth_sim.git
+git clone https://github.com/DivKGitHub/cloth_sim.git
 cd cloth_sim
+git submodule update --init --recursive
 
 # Create and activate a Python 3.11 venv
 uv venv --python=3.11
