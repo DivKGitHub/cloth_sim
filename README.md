@@ -14,16 +14,37 @@ IsaacLab-based XR teleoperation has been incorporated into this branch from this
 
 ## Installation
 
+It is recommended to run this repo natively on a Linux distribution.
+
+1. Clone the repo with all four submodules: `IsaacLab`, `XRoboToolKit`, `newton` and `rl_games`.
+
 ```bash
-# Clone with submodules
 git clone https://github.com/DivKGitHub/cloth_sim.git
 cd cloth_sim
 git submodule update --init --recursive
+```
 
-# Create and activate a Python 3.11 venv
+2. It is recommended to use UV as the package manager for your virtual environment so ensure it is installed and create a Python 3.11 UV venv.
+
+```bash
 uv venv --python=3.11
 source .venv/bin/activate
+```
 
+3. Install the `IsaacLab` submodule first with the below additional packages.
+
+```bash
+# installing IsaacSim
+uv pip install "isaacsim[all,extscache]==5.1.0" --extra-index-url https://pypi.nvidia.com
+uv pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
+
+# installing IsaacLab
+cd IsaacLab
+./isaaclab.sh --install
+cd ..
+```
+
+```bash
 # Install Newton
 cd newton && uv pip install -e ".[examples]" && cd ..
 
