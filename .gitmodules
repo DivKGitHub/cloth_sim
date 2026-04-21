@@ -4,6 +4,9 @@
 [submodule "rl_games"]
 	path = rl_games
 	url = git@github.com:kywind/rl_games.git
-[submodule "submodules/IsaacLab"]
+[submodule "teleop_submodules/IsaacLab"]
 	path = submodules/IsaacLab
 	url = https://github.com/isaac-sim/IsaacLab.git
+[submodule "teleop_submodules/XRoboToolKit"]
+	path = teleop_submodules/XRoboToolKit
+	url = https://github.com/XR-Robotics/XRoboToolkit-PC-Service-Pybind.git
