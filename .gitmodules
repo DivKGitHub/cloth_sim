@@ -1,9 +1,9 @@
 [submodule "newton"]
 	path = newton
-	url = git@github.com:kywind/newton.git
+	url = https://github.com/kywind/newton.git
 [submodule "rl_games"]
 	path = rl_games
-	url = git@github.com:kywind/rl_games.git
+	url = https://github.com/kywind/rl_games.git
 [submodule "IsaacLab"]
 	path = IsaacLab
 	url = https://github.com/isaac-sim/IsaacLab.git
