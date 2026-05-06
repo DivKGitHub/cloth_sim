@@ -31,12 +31,11 @@ uv venv --python=3.11
 source .venv/bin/activate
 ```
 
-3. Install the `IsaacLab` submodule first with the below additional packages.
+3. Install the `IsaacLab` submodule. Try using `LIDAR_WiFi_5G` if there are timeout errors.
 
 ```bash
 # installing IsaacSim
 uv pip install "isaacsim[all,extscache]==5.1.0" --extra-index-url https://pypi.nvidia.com
-uv pip install -U torch==2.7.0 torchvision==0.22.0 --index-url https://download.pytorch.org/whl/cu128
 
 # installing IsaacLab
 cd IsaacLab
@@ -44,13 +43,16 @@ cd IsaacLab
 cd ..
 ```
 
+4. Install the `newton` submodule.
 ```bash
-# Install Newton
 cd newton && uv pip install -e ".[examples]" && cd ..
 
 # (Optional) Verify Newton installation
 cd newton && python -m newton.examples robot_h1 && cd ..
+```
 
+5. Install additional dependencies and adjust package versions.
+```bash
 # Install PyTorch (CUDA 12.8)
 uv pip install torch==2.7.1 torchvision==0.22.1 torchaudio==2.7.1 --index-url https://download.pytorch.org/whl/cu128
 
@@ -60,11 +62,19 @@ uv pip install opencv-python omegaconf hydra-core pynput transforms3d
 # Version fixes
 uv pip install imgui_bundle==1.92.5
 uv pip install --upgrade warp-lang
+```
 
-# Install rl_games (for RL training and eval)
+5. Install the `rl_games` submodule for RL training and evaluation.
+```bash
 cd rl_games && uv pip install -e . && cd ..
 ```
 
+6. Install `XRoboToolKit`
+```bash
+cd XRoboToolkit
+bash setup_ubuntu.sh
+cd ..
+```
 ---
 
 ## Quick Start
