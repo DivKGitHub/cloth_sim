@@ -31,7 +31,7 @@ uv venv --python=3.11
 source .venv/bin/activate
 ```
 
-3. Install the `IsaacLab` submodule. Try using `LIDAR_WiFi_5G` if there are timeout errors.
+3. Install the `IsaacLab` submodule. Try using `LIDAR_WiFi_5G` if there are timeout errors. This is a heavy submodule so ensure sufficient disk space.
 
 ```bash
 # installing IsaacSim
